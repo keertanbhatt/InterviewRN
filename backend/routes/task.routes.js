@@ -2,19 +2,11 @@ const express = require("express");
 const router = express.Router();
 
 let todoList = require("../controller/task.controller");
-
-router.get("/", todoList.list_all_tasks);
-
+const { createTask, deleteTask } = require("../controller/task.controller");
 // create a todo
-router.post("/", todoList.create_a_task);
-
-// read a single task
-router.get("/:taskId", todoList.read_a_task);
-
-// update a single task
-router.put("/:taskId", todoList.update_a_task);
-
-// delete a single task
-router.delete("/:taskId", todoList.delete_a_task);
+const taskRouter = express.Router();
+taskRouter.post("/task/createTask", createTask);
+// Delete a todo
+taskRouter.delete("/task/deleteTask", deleteTask);
 
 module.exports = router;

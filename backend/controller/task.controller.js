@@ -1,40 +1,21 @@
 const mongoose = require("mongoose");
-const Task = mongoose.model("Tasks");
-exports.list_all_tasks = (req, res) => {
-  Task.find({}, (err, task) => {
-    if (err) throw err;
+const Task = require("../model/task.model");
+// const Task = mongoose.model("Tasks");
 
-    res.status(200).json({
-      message: "Tasks fetched successfully",
-      result: task,
+const createTask = async (req, res) => {
+  const task = new Task(req.body);
+
+  try {
+    const savedTask = await task.save();
+    res.status(201).json({
+      message: "Task Created!!!",
+      task: savedTask,
     });
-  });
-};
-
-exports.create_a_task = (req, res) => {
-  let newTask = new Task({
-    name: req.body.name,
-  });
-
-  newTask.save((err, task) => {
-    if (err) throw err;
-
-    res.status(200).json({
-      message: "Task created successfully",
-      result: task,
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
     });
-  });
-};
-
-exports.read_a_task = (req, res) => {
-  Task.findOne(req.params.taskId, (err, task) => {
-    if (err) throw err;
-
-    res.status(200).json({
-      message: "Single Task fetched successfully",
-      result: task,
-    });
-  });
+  }
 };
 
 exports.update_a_task = (req, res) => {
@@ -52,13 +33,28 @@ exports.update_a_task = (req, res) => {
     }
   );
 };
+const deleteTask = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
 
-exports.delete_a_task = (req, res) => {
-  Task.remove({ _id: req.params.taskId }, (err, task) => {
-    if (err) throw err;
-
-    res.status(200).json({
-      message: "Task deleted successfully",
+    try {
+      const deletedTask = await task.deleteOne();
+      res.status(202).json({
+        message: "Task is Deleted",
+        task: deletedProduct,
+      });
+    } catch (err) {
+      res.status(400).json({
+        message: err.message,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
     });
-  });
+  }
+};
+module.exports = {
+  createTask,
+  deleteTask,
 };
